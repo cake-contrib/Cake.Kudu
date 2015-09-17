@@ -83,6 +83,10 @@ Task("Publish")
     .IsDependentOn("Build")
     .Does(() =>
 {
+    Information("Cleaning {0}", deploymentPath);
+    CleanDirectories(deploymentPath.FullPath);
+
+    Information("Deploying web to {0}", deploymentPath);
     CopyDirectory(websitePath, deploymentPath);
 });
 
