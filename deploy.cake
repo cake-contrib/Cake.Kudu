@@ -1,0 +1,115 @@
+///////////////////////////////////////////////////////////////////////////////
+// ARGUMENTS
+///////////////////////////////////////////////////////////////////////////////
+
+var target          = Argument<string>("target", "Default");
+var configuration   = Argument<string>("configuration", "Release");
+
+///////////////////////////////////////////////////////////////////////////////
+// GLOBAL VARIABLES
+///////////////////////////////////////////////////////////////////////////////
+var websitePath     = MakeAbsolute(Directory("./src/TestWebSite"));
+var solutionPath    = MakeAbsolute(File("./src/TestWebSite.sln"));
+var deploymentTarget= EnvironmentVariable("DEPLOYMENT_TARGET");
+if (string.IsNullOrWhiteSpace(deploymentTarget))
+{
+    throw new Exception("No valid deployment target found.");
+}
+
+var deploymentPath = MakeAbsolute(Directory(deploymentTarget));
+if (!DirectoryExists(deploymentPath))
+{
+    throw new DirectoryNotFoundException(
+        string.Format(
+            "Deployment target directory not found {0}",
+            deploymentPath
+            )
+        );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// SETUP / TEARDOWN
+///////////////////////////////////////////////////////////////////////////////
+
+Setup(() =>
+{
+    // Executed BEFORE the first task.
+    Information("Running tasks...");
+});
+
+Teardown(() =>
+{
+    // Executed AFTER the last task.
+    Information("Finished running tasks.");
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// TASK DEFINITIONS
+///////////////////////////////////////////////////////////////////////////////
+
+Task("Clean")
+    .Does(() =>
+{
+    //Clean up any binaries
+    Information("Cleaning {0}", websitePath);
+    CleanDirectories(websitePath + "/bin");
+});
+
+Task("Restore")
+    .Does(() =>
+{
+    // Restore all NuGet packages.
+    Information("Restoring {0}...", solutionPath);
+    NuGetRestore(solutionPath);
+});
+
+Task("Build")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Restore")
+    .Does(() =>
+{
+    // Build all solutions.
+    Information("Building {0}", solutionPath);
+    MSBuild(solutionPath, settings =>
+        settings.SetPlatformTarget(PlatformTarget.MSIL)
+            .WithProperty("TreatWarningsAsErrors","true")
+            .WithTarget("Build")
+            .SetConfiguration(configuration));
+});
+
+
+Task("Publish")
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    CopyDirectory(websitePath, deploymentPath);
+});
+
+
+Task("Default")
+    .IsDependentOn("Publish");
+
+
+///////////////////////////////////////////////////////////////////////////////
+// EXECUTION
+///////////////////////////////////////////////////////////////////////////////
+
+RunTarget(target);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// TEMP DEBUG CODE
+///////////////////////////////////////////////////////////////////////////////
+var envVars = System.Environment.GetEnvironmentVariables();
+foreach(var envVar in envVars.Cast<System.Collections.DictionaryEntry>().OrderBy(key=>key.Key))
+{
+    Information(
+        "Key: {0}Value: \"{1}\"",
+        envVar.Key.ToString().PadRight(40),
+        envVar.Value
+        );
+}
+
+//var indexHtmlPath = deploymentPath.CombineWithFilePath("index.html");
+//System.IO.File.WriteAllText(indexHtmlPath.ToString(), "Hello from Cake!", Encoding.UTF8);
