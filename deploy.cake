@@ -105,12 +105,17 @@ RunTarget(target);
 ///////////////////////////////////////////////////////////////////////////////
 // TEMP DEBUG CODE
 ///////////////////////////////////////////////////////////////////////////////
-var envVars = System.Environment.GetEnvironmentVariables();
-foreach(var envVar in envVars.Cast<System.Collections.DictionaryEntry>().OrderBy(key=>key.Key))
+var envVars = Context.Environment.GetEnvironmentVariables();
+string path;
+if (envVars.TryGetValue("PATH", out path))
+{
+    Information("Path: {0}", path);
+}
+foreach(var envVar in envVars)
 {
     Information(
         "Key: {0}Value: \"{1}\"",
-        envVar.Key.ToString().PadRight(40),
+        envVar.Key.PadRight(40),
         envVar.Value
         );
 }
