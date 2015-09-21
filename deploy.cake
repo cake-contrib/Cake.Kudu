@@ -1,22 +1,21 @@
+#addin "Cake.Kudu"
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 
 var target          = Argument<string>("target", "Default");
 var configuration   = Argument<string>("configuration", "Release");
-
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
 var websitePath     = MakeAbsolute(Directory("./src/TestWebSite"));
 var solutionPath    = MakeAbsolute(File("./src/TestWebSite.sln"));
-var deploymentTarget= EnvironmentVariable("DEPLOYMENT_TARGET");
-if (string.IsNullOrWhiteSpace(deploymentTarget))
+if (!Kudu.IsRunningOnKudu)
 {
-    throw new Exception("No valid deployment target found.");
+    throw new Exception("Not running on Kudu");
 }
 
-var deploymentPath = MakeAbsolute(Directory(deploymentTarget));
+var deploymentPath = Kudu.Deployment.Target;
 if (!DirectoryExists(deploymentPath))
 {
     throw new DirectoryNotFoundException(
@@ -83,11 +82,12 @@ Task("Publish")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    Information("Cleaning {0}", deploymentPath);
+    /*Information("Cleaning {0}", deploymentPath);
     CleanDirectories(deploymentPath.FullPath);
 
     Information("Deploying web to {0}", deploymentPath);
-    CopyDirectory(websitePath, deploymentPath);
+    CopyDirectory(websitePath, deploymentPath);*/
+    Kudu.Sync(websitePath);
 });
 
 
