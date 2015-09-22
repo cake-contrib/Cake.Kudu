@@ -19,6 +19,7 @@ namespace Cake.Kudu
         /// <returns>A <see cref="KuduProvider"/> instance.</returns>
         [CakePropertyAlias(Cache = true)]
         [CakeNamespaceImport("Cake.Kudu.Provider")]
+        [CakeNamespaceImport("Cake.Kudu.KuduSync")]
         // ReSharper disable once UnusedMember.Global
         public static KuduProvider Kudu(this ICakeContext context)
         {
