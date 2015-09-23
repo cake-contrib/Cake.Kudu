@@ -1,6 +1,7 @@
 # Cake Kudu
 Cake add-in to help with Kudu deployments using C#
-This is still early experimental, but feedback is welcome.
+This is still early & experimental, but feedback is welcome.
+![Cake Kudu Azure Portal](https://raw.githubusercontent.com/WCOMAB/Cake.Kudu/master/cakekuduportal.png)
 
 ## Kudu
 [Kudu](https://github.com/projectkudu/kudu) is the engine behind git deployments in Azure Web Sites. It can also run outside of Azure.
