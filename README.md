@@ -1,5 +1,6 @@
 # Cake Kudu
 Cake add-in to help with Kudu deployments using C#
+This is still early experimental, but feedback is welcome.
 
 ## Kudu
 [Kudu](https://github.com/projectkudu/kudu) is the engine behind git deployments in Azure Web Sites. It can also run outside of Azure.
@@ -27,9 +28,17 @@ Exposes source countrol properties like commit id, branch, etc.
 Exposed paths to tools that can be used in the Kudu environment. 
 
 ### WebSite
-Exposed environmentatl information about running website, like hostname, compute mode, sku, etc.
+Exposed environmental information about running website, like hostname, compute mode, sku, etc.
+
+### App Settings
+Exposes web site app settings.
+
+### Connection strings
+Exposes web connection strings.
 
 ## Usage
+Complete API/DSL reference can be found [here](http://cakebuild.net/dsl/kudu) 
+
 The addin is loaded in Cake via the `#addin` directive
 ```csharp? 
 #addin "Cake.Kudu"
@@ -61,5 +70,26 @@ The Kudu sync command is exposed via a convinent Sync method.
 Information("Deploying web from {0} to {1}", websitePath, deploymentPath);
 Kudu.Sync(websitePath);
 ```
-
+AppSettings can be accessed via the `IDictionary<string, string> AppSettings` property. 
+```csharp
+foreach(var appSetting in Kudu.AppSettings)
+{
+    Information(
+        "Key: {0}Value: \"{1}\"",
+        appSetting.Key.PadRight(40),
+        appSetting.Value
+        );
+}
+```
+Connection strings can be accessed `IDictionary<string, string> AppSettings` property. 
+```csharp
+foreach(var conectionString in Kudu.ConnectionStrings)
+{
+    Information(
+        "Key: {0}Value: \"{1}\"",
+        conectionString.Key.PadRight(40),
+        conectionString.Value
+        );
+}
+```
 An complete deployment script can be found [here](https://github.com/WCOMAB/Cake.Kudu/blob/master/deploy.cake)

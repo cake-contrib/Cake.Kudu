@@ -101,7 +101,28 @@ RunTarget(target);
 ///////////////////////////////////////////////////////////////////////////////
 // TEMP DEBUG CODE
 ///////////////////////////////////////////////////////////////////////////////
-var envVars = Context.Environment.GetEnvironmentVariables();
+Information("AppSettings");
+foreach(var appSetting in Kudu.AppSettings)
+{
+    Information(
+        "Key: {0}Value: \"{1}\"",
+        appSetting.Key.PadRight(40),
+        appSetting.Value
+        );
+}
+
+Information("ConnectionStrings");
+foreach(var conectionString in Kudu.ConnectionStrings)
+{
+    Information(
+        "Key: {0}Value: \"{1}\"",
+        conectionString.Key.PadRight(40),
+        conectionString.Value
+        );
+}
+
+Information("EnvironmentVariables");
+var envVars = EnvironmentVariables();
 string path;
 if (envVars.TryGetValue("PATH", out path))
 {
