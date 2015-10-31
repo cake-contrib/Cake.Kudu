@@ -16,6 +16,8 @@ This enables more advanced deployment scenarios like i.e. a single repository co
 
 It will also enable to adjust build process/output based on configuration and not code.
 
+Documentation for the Cake.Kudu addin can be found here: [http://cakebuild.net/api/cake.kudu](http://cakebuild.net/api/cake.kudu).
+
 ## Features
 The addin exposes 4 key areas of the Kudu environment
 
