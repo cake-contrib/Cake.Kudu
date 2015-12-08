@@ -12,7 +12,7 @@ namespace Cake.Kudu.Provider
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnusedAutoPropertyAccessor.Global
         /// <summary>
-        /// Gets the command that triggerd deployment
+        /// Gets the command that triggered deployment
         /// </summary>
         public string Command { get; }
 
@@ -32,12 +32,12 @@ namespace Cake.Kudu.Provider
         public DirectoryPath Temp { get; }
 
         /// <summary>
-        /// Gets the Kudysync next manifest path. 
+        /// Gets the KuduSync next manifest path. 
         /// </summary>
         public FilePath NextManifest { get; }
 
         /// <summary>
-        /// Gets the Kudysync previous / current manifest path. 
+        /// Gets the KuduSync previous / current manifest path. 
         /// </summary>
         public FilePath PreviousManifest { get; }
         // ReSharper restore MemberCanBePrivate.Global
