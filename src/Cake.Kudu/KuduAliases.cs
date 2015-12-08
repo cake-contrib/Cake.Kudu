@@ -6,7 +6,7 @@ using Cake.Kudu.Provider;
 namespace Cake.Kudu
 {
     /// <summary>
-    /// Contains aliases related to Kudu web site evironment and deployment
+    /// Contains aliases related to Kudu web site environment and deployment
     /// </summary>
     [CakeAliasCategory("Kudu")]
     // ReSharper disable once UnusedMember.Global
