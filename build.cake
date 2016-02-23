@@ -106,13 +106,6 @@ Task("Clean")
 Task("Restore")
     .Does(() =>
 {
-    // Add Cake MyGet Feed Source to be able to use pre-release
-    if (!NuGetHasSource(
-         "https://www.myget.org/F/cake"))
-    {
-        NuGetAddSource("Cake-MyGet", "https://www.myget.org/F/cake");
-    }
-
     // Restore all NuGet packages.
     foreach(var solution in solutions)
     {

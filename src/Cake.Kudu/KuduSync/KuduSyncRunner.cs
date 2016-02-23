@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cake.Core;
 using Cake.Core.IO;
-using Cake.Core.Utilities;
+using Cake.Core.Tooling;
 
 namespace Cake.Kudu.KuduSync
 {
@@ -46,8 +46,7 @@ namespace Cake.Kudu.KuduSync
 
             settings = settings ?? new KuduSyncSettings();
 
-            Run(settings, GetArguments(source, target, settings),
-                settings.ToolPath);
+            Run(settings, GetArguments(source, target, settings));
         }
 
         private ProcessArgumentBuilder GetArguments(DirectoryPath source, DirectoryPath target, KuduSyncSettings settings)

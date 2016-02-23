@@ -1,19 +1,14 @@
 ﻿using System.Collections.Generic;
 using Cake.Core.IO;
+using Cake.Core.Tooling;
 
 namespace Cake.Kudu.KuduSync
 {
     /// <summary>
     /// Contains settings used by <see cref="KuduSyncRunner"/>.
     /// </summary>
-    public sealed class KuduSyncSettings
+    public sealed class KuduSyncSettings :ToolSettings
     {
-        /// <summary>
-        /// Gets or sets the tool path.
-        /// </summary>
-        /// <value>The tool path.</value>
-        public FilePath ToolPath { get; set; }
-
         /// <summary>
         /// Gets or sets path to next manifest
         /// </summary>
