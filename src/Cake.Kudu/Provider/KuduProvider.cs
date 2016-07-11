@@ -158,7 +158,7 @@ namespace Cake.Kudu.Provider
             IsRunningOnKudu = !string.IsNullOrWhiteSpace(WebSite.Name);
 
 
-            _kuduSyncRunner = new KuduSyncRunner(context.FileSystem, context.Environment, context.Globber, context.ProcessRunner);
+            _kuduSyncRunner = new KuduSyncRunner(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools);
         }
     }
 }
