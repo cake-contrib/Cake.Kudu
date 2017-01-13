@@ -1,0 +1,73 @@
+﻿{
+  "version": "0.4.0-*",
+  "description": "Cake Kudu AddIn",
+  "copyright": "Copyright © WCOM AB 2017",
+  "title": "Cake.Kudu",
+  "authors": [
+    "WCOM AB"
+  ],
+  "packOptions": {
+    "summary": "Cake AddIn that extends Cake with Kudu evironment and deployment features",
+    "projectUrl": "https://github.com/WCOMAB/Cake.Kudu/",
+    "licenseUrl": "https://github.com/WCOMAB/Cake.Kudu/blob/master/LICENSE",
+    "iconUrl": "http://cdn.rawgit.com/WCOMAB/nugetpackages/master/Chocolatey/icons/wcom.png",
+    "releaseNotes": "Ported to .NET Core\r\nUpdated to Cake 0.17.0",
+    "requireLicenseAcceptance": false,
+    "tags": [
+      "Cake",
+      "Script",
+      "Build",
+      "Kudu",
+      "Azure",
+      "Deployment"
+    ],
+    "owners": [
+      "devlead",
+      "WCOMAB",
+      "cake-contrib"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/WCOMAB/Cake.Kudu"
+    }
+  },
+  "buildOptions": {
+    "debugType": "portable",
+    "xmlDoc": true,
+    "platform": "anycpu",
+    "compile": {
+      "includeFiles": [
+        "../SolutionInfo.cs"
+      ]
+    }
+  },
+  "dependencies": {
+    "Cake.Core": {
+      "version": "0.17.0",
+      "type": "build"
+    },
+    "Cake.Common": {
+      "version": "0.17.0",
+      "type": "build"
+    }
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.Collections.NonGeneric": "4.0.1",
+        "System.Collections.Specialized": "4.0.1"
+      }
+    },
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Xml": {
+          "type": "build"
+        },
+        "System.Net.Http": {
+          "type": "build"
+        }
+      }
+    }
+  }
+}

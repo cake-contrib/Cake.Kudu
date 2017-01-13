@@ -1,3 +1,5 @@
+#addin "nuget:https://www.nuget.org/api/v2?package=Newtonsoft.Json&version=9.0.1"
+
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,9 +18,11 @@ var releaseNotes        = ParseReleaseNotes("./ReleaseNotes.md");
 var version             = releaseNotes.Version.ToString();
 var binDir              = "./src/Cake.Kudu/bin/" + configuration;
 var nugetRoot           = "./nuget/";
-var semVersion          = isLocalBuild
-                                ? version
-                                : string.Concat(version, "-build-", AppVeyor.Environment.Build.Number);
+var versionSuffix       = isLocalBuild
+                                ? string.Empty
+                                : string.Concat("-build-", AppVeyor.Environment.Build.Number);
+var semVersion          = string.Concat(version, versionSuffix);
+
 var assemblyInfo        = new AssemblyInfoSettings {
                                 Title                   = "Cake.Kudu",
                                 Description             = "Cake Kudu AddIn",
@@ -44,15 +48,8 @@ var nuGetPackSettings   = new NuGetPackSettings {
                                 LicenseUrl              = new Uri("https://github.com/WCOMAB/Cake.Kudu/blob/master/LICENSE"),
                                 Copyright               = assemblyInfo.Copyright,
                                 ReleaseNotes            = releaseNotes.Notes.ToArray(),
-                                Tags                    = new [] {"Cake", "Script", "Build", "Kudu"},
+                                Tags                    = new [] {"Cake", "Script", "Build", "Kudu", "Azure", "Deployment"},
                                 RequireLicenseAcceptance= false,
-                                Symbols                 = false,
-                                NoPackageAnalysis       = true,
-                                Files                   = new [] {
-                                                                    new NuSpecContent {Source = "Cake.Kudu.dll"},
-                                                                    new NuSpecContent {Source = "Cake.Kudu.pdb"},
-                                                                    new NuSpecContent {Source = "Cake.Kudu.xml"}
-                                                                 },
                                 BasePath                = binDir,
                                 OutputDirectory         = nugetRoot
                             };
@@ -101,22 +98,36 @@ Task("Clean")
         CleanDirectories(path + "/**/bin/" + configuration);
         CleanDirectories(path + "/**/obj/" + configuration);
     }
+    Information("Cleaning {0}", nugetRoot);
+    CleanDirectory(nugetRoot);
 });
 
 Task("Restore")
+    .IsDependentOn("Clean")
+    .Does(ctx => {
+        DotNetCoreRestore("./", new DotNetCoreRestoreSettings {
+            Sources = new [] { "https://api.nuget.org/v3/index.json" },
+            Verbosity = DotNetCoreRestoreVerbosity.Warning
+        });
+});
+
+Task("Patch-Project-Json")
+    .IsDependentOn("Clean")
     .Does(() =>
 {
-    // Restore all NuGet packages.
-    foreach(var solution in solutions)
+    var projects = GetFiles("./src/**/project.json");
+    foreach(var project in projects)
     {
-        Information("Restoring {0}...", solution);
-        NuGetRestore(solution);
+        if(!PatchProjectJson(project, version, nuGetPackSettings)) {
+            Warning("No version specified in {0}.", project.FullPath);
+        }
     }
 });
 
 Task("SolutionInfo")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
+    .IsDependentOn("Patch-Project-Json")
     .Does(() =>
 {
     var file = "./src/SolutionInfo.cs";
@@ -127,18 +138,15 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .IsDependentOn("SolutionInfo")
+    .IsDependentOn("Patch-Project-Json")
     .Does(() =>
 {
-    // Build all solutions.
-    foreach(var solution in solutions)
+   var projects = GetFiles("./**/project.json");
+    foreach(var project in projects)
     {
-        Information("Building {0}", solution);
-        MSBuild(solution, settings =>
-            settings.SetPlatformTarget(PlatformTarget.MSIL)
-                .UseToolVersion(MSBuildToolVersion.VS2015)
-                .WithProperty("TreatWarningsAsErrors","true")
-                .WithTarget("Build")
-                .SetConfiguration(configuration));
+        DotNetCoreBuild(project.GetDirectory().FullPath, new DotNetCoreBuildSettings {
+            Configuration = configuration
+        });
     }
 });
 
@@ -151,7 +159,18 @@ Task("Create-NuGet-Package")
     {
         CreateDirectory(nugetRoot);
     }
-    NuGetPack(nuGetPackSettings);
+
+    var projects = GetFiles("./**/project.json");
+    foreach(var project in projects)
+    {
+        DotNetCorePack(project.GetDirectory().FullPath, new DotNetCorePackSettings {
+            VersionSuffix = versionSuffix,
+            Configuration = configuration,
+            OutputDirectory = nugetRoot,
+            NoBuild = true,
+            Verbose = false
+        });
+    }
 });
 
 Task("Publish-MyGet")
@@ -193,3 +212,26 @@ Task("AppVeyor")
 ///////////////////////////////////////////////////////////////////////////////
 
 RunTarget(target);
+
+public static bool PatchProjectJson(FilePath project, string version, NuGetPackSettings nuGetPackSettings)
+{
+    var content = System.IO.File.ReadAllText(project.FullPath, Encoding.UTF8);
+    var node = Newtonsoft.Json.Linq.JObject.Parse(content);
+    if(node["version"] != null)
+    {
+        node["version"].Replace(string.Concat(version, "-*"));
+        node["description"]?.Replace(nuGetPackSettings.Description);
+        node["copyright"]?.Replace(nuGetPackSettings.Copyright);
+        node["title"]?.Replace(nuGetPackSettings.Title);
+        node["packOptions"]?["summary"]?.Replace(nuGetPackSettings.Summary);
+        node["packOptions"]?["projectUrl"]?.Replace(nuGetPackSettings.ProjectUrl);
+        node["packOptions"]?["licenseUrl"]?.Replace(nuGetPackSettings.LicenseUrl);
+        node["packOptions"]?["iconUrl"]?.Replace(nuGetPackSettings.IconUrl);
+        node["packOptions"]?["releaseNotes"]?.Replace(string.Join("\r\n", nuGetPackSettings.ReleaseNotes));
+        node["packOptions"]?["requireLicenseAcceptance"]?.Replace(nuGetPackSettings.RequireLicenseAcceptance);
+        node["packOptions"]?["tags"]?.Replace(Newtonsoft.Json.Linq.JToken.FromObject(nuGetPackSettings.Tags));
+        System.IO.File.WriteAllText(project.FullPath, node.ToString(), Encoding.UTF8);
+        return true;
+    };
+    return false;
+}

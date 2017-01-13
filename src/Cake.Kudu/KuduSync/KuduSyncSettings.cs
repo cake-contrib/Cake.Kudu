@@ -24,7 +24,7 @@ namespace Cake.Kudu.KuduSync
         /// </summary>
         // ReSharper disable once CollectionNeverUpdated.Global
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public ICollection<DirectoryPath> PathsToIgnore { get; set; }
+        public ICollection<string> PathsToIgnore { get; set; }
         
         /// <summary>
         /// Gets or sets if manifests should be ignored

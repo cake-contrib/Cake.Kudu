@@ -7,6 +7,6 @@ environment:
     secure: TjA80Nd4DZXk0r9ZXwgLn5rP23UkgYWPUjIw7M0YHkcuxM7HZ39umP3GmdkKH8Jv
 # Build script
 build_script:
-  - ps: .\build.ps1 -Target AppVeyor
+  - ps: .\build.ps1 build.cake --target=AppVeyor
 # Tests
 test: off

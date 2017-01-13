@@ -190,3 +190,8 @@ FakesAssemblies/
 
 # Kudu Local
 [Ll]ocal[Dd]eploy/
+
+# .NET Core
+project.lock.json
+.dotnet/
+restore.dg
