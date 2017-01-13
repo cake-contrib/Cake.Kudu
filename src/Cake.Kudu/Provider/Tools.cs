@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cake.Core.IO;
 using Cake.Kudu.Helpers;
 
@@ -35,6 +36,7 @@ namespace Cake.Kudu.Provider
         /// <summary>
         /// Gets path to the .NET SDK Manager PowerShell script.
         /// </summary>
+        [Obsolete(".NET Core replaced DNV, this property will be removed in next version.", false)]
         // ReSharper disable once InconsistentNaming
         public FilePath DNVMPs { get; }
         // ReSharper restore MemberCanBePrivate.Global
@@ -47,7 +49,9 @@ namespace Cake.Kudu.Provider
             MSBuild = environmenVariables.TryParseFilePath("MSBUILD_PATH");
             NPMJs = environmenVariables.TryParseFilePath("NPM_JS_PATH");
             NuGet = environmenVariables.TryParseFilePath("NUGET_EXE");
+#pragma warning disable 618
             DNVMPs = environmenVariables.TryParseFilePath("SCM_DNVM_PS_PATH");
+#pragma warning restore 618
         }
     }
 }

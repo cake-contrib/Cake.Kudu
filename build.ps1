@@ -1,111 +1,97 @@
-<#
-
-.SYNOPSIS
-This is a Powershell script to bootstrap a Cake build.
-
-.DESCRIPTION
-This Powershell script will download NuGet if missing, restore NuGet tools (including Cake)
-and execute your Cake build script with the parameters you provide.
-
-.PARAMETER Script
-The build script to execute.
-.PARAMETER Target
-The build script target to run.
-.PARAMETER Configuration
-The build configuration to use.
-.PARAMETER Verbosity
-Specifies the amount of information to be displayed.
-.PARAMETER WhatIf
-Performs a dry run of the build script.
-No tasks will be executed.
-.PARAMETER Experimental
-Tells Cake to use the latest Roslyn release.
-
-.LINK
-http://cakebuild.net
-#>
-
-Param(
-    [string]$Script = "build.cake",
-    [string]$Target = "Default",
-    [string]$Configuration = "Release",
-    [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
-    [string]$Verbosity = "Verbose",
-    [Alias("DryRun","Noop")]
-    [switch]$Experimental,
-    [switch]$WhatIf
-)
-
-$TOOLS_DIR = Join-Path $PSScriptRoot "tools"
-$NUGET_EXE = Join-Path $TOOLS_DIR "nuget.exe"
-$CAKE_EXE = Join-Path $TOOLS_DIR "Cake/Cake.exe"
-$PACKAGES_CONFIG = Join-Path $TOOLS_DIR "packages.config"
-
-# Should we use the new Roslyn?
-$UseExperimental = "";
-if($Experimental.IsPresent) {
-    $UseExperimental = "-experimental"
-}
-
-# Is this a dry run?
-$UseDryRun = "";
-if($WhatIf.IsPresent) {
-    $UseDryRun = "-dryrun"
-}
+$CakeVersion = "0.16.2"
+$DotNetChannel = "preview";
+$DotNetVersion = "1.0.0-preview2-003121";
+$DotNetInstallerUri = "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview2/scripts/obtain/dotnet-install.ps1";
 
 # Make sure tools folder exists
-if ((Test-Path $PSScriptRoot) -and !(Test-Path $TOOLS_DIR)) {
-    New-Item -path $TOOLS_DIR -name logfiles -itemtype directory
+$PSScriptRoot   = Split-Path $MyInvocation.MyCommand.Path -Parent
+$ToolPath       = Join-Path $PSScriptRoot "tools"
+$AddinsPath     = Join-Path $ToolPath "Addins"
+
+if (!(Test-Path $ToolPath)) {
+    Write-Verbose "Creating tools directory..."
+    New-Item -Path $ToolPath -Type directory | Out-Null
+}
+if (!(Test-Path $AddinsPath)) {
+    Write-Verbose "Creating addins directory..."
+    New-Item -Path $AddinsPath -Type directory | Out-Null
 }
 
-# Try find NuGet.exe in path if not exists
-if (!(Test-Path $NUGET_EXE)) {
-    "Trying to find nuget.exe in path"
-    $NUGET_EXE_IN_PATH = &where.exe nuget.exe
-    if ($NUGET_EXE_IN_PATH -ne $null -and (Test-Path $NUGET_EXE_IN_PATH)) {
-        "Found $($NUGET_EXE_IN_PATH)"
-        $NUGET_EXE = $NUGET_EXE_IN_PATH
+###########################################################################
+# INSTALL .NET CORE CLI
+###########################################################################
+
+Function Remove-PathVariable([string]$VariableToRemove)
+{
+    $path = [Environment]::GetEnvironmentVariable("PATH", "User")
+    if ($path -ne $null)
+    {
+        $newItems = $path.Split(';', [StringSplitOptions]::RemoveEmptyEntries) | Where-Object { "$($_)" -inotlike $VariableToRemove }
+        [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join(';', $newItems), "User")
+    }
+
+    $path = [Environment]::GetEnvironmentVariable("PATH", "Process")
+    if ($path -ne $null)
+    {
+        $newItems = $path.Split(';', [StringSplitOptions]::RemoveEmptyEntries) | Where-Object { "$($_)" -inotlike $VariableToRemove }
+        [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join(';', $newItems), "Process")
     }
 }
 
-# Try download NuGet.exe if not exists
-if (!(Test-Path $NUGET_EXE)) {
-    Invoke-WebRequest -Uri http://nuget.org/nuget.exe -OutFile $NUGET_EXE
+# Get .NET Core CLI path if installed.
+$FoundDotNetCliVersion = $null;
+if (Get-Command dotnet -ErrorAction SilentlyContinue) {
+    $FoundDotNetCliVersion = dotnet --version;
 }
 
-# Make sure NuGet exists where we expect it.
-if (!(Test-Path $NUGET_EXE)) {
-    Throw "Could not find NuGet.exe"
+if($FoundDotNetCliVersion -ne $DotNetVersion) {
+    $InstallPath = Join-Path $PSScriptRoot ".dotnet"
+    if (!(Test-Path $InstallPath)) {
+        mkdir -Force $InstallPath | Out-Null;
+    }
+    (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
+    & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath;
+
+    Remove-PathVariable "$InstallPath"
+    $env:PATH = "$InstallPath;$env:PATH"
+    $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+    $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
 }
 
-# Save nuget.exe path to environment to be available to child processed
-$ENV:NUGET_EXE = $NUGET_EXE
+###########################################################################
+# INSTALL CAKE
+###########################################################################
 
-# Restore tools from NuGet.
-Push-Location
-Set-Location $TOOLS_DIR
-
-# Restore packages
-if (Test-Path $PACKAGES_CONFIG)
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+Function Unzip
 {
-    Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion"
-}
-# Install just Cake if missing config
-else
-{
-    Invoke-Expression "&`"$NUGET_EXE`" install Cake -ExcludeVersion"
-}
-Pop-Location
-if ($LASTEXITCODE -ne 0)
-{
-    exit $LASTEXITCODE
+    param([string]$zipfile, [string]$outpath)
+
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
-# Make sure that Cake has been installed.
-if (!(Test-Path $CAKE_EXE)) {
-    Throw "Could not find Cake.exe"
+
+# Make sure Cake has been installed.
+$CakePath = Join-Path $ToolPath "Cake.CoreCLR.$CakeVersion/Cake.dll"
+if (!(Test-Path $CakePath)) {
+    Write-Host "Installing Cake..."
+    (New-Object System.Net.WebClient).DownloadFile("https://www.nuget.org/api/v2/package/Cake.CoreCLR/$CakeVersion", "$ToolPath\Cake.CoreCLR.zip")
+    Unzip "$ToolPath\Cake.CoreCLR.zip" "$ToolPath/Cake.CoreCLR.$CakeVersion"
+    Remove-Item "$ToolPath\Cake.CoreCLR.zip"
 }
 
-# Start Cake
-Invoke-Expression "$CAKE_EXE `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" $UseDryRun $UseExperimental"
+$JsonNetPath = Join-Path $AddinsPath "Newtonsoft.Json/lib/netstandard1.0/Newtonsoft.Json.dll"
+if (!(Test-Path $JsonNetPath)) {
+    Write-Host "Installing JSON.Net..."
+    $ZipPath = "$AddinsPath\Newtonsoft.Json.zip"
+    (New-Object System.Net.WebClient).DownloadFile("https://www.nuget.org/api/v2/package/Newtonsoft.Json/9.0.1",  $ZipPath)
+    Unzip $ZipPath "$AddinsPath/Newtonsoft.Json"
+    Remove-Item $ZipPath
+}
+
+###########################################################################
+# RUN BUILD SCRIPT
+###########################################################################
+
+& dotnet "$CakePath" $args
 exit $LASTEXITCODE
