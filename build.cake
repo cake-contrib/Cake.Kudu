@@ -164,7 +164,7 @@ Task("Create-NuGet-Package")
     foreach(var project in projects)
     {
         DotNetCorePack(project.GetDirectory().FullPath, new DotNetCorePackSettings {
-            VersionSuffix = versionSuffix,
+            VersionSuffix = versionSuffix.TrimStart('-'),
             Configuration = configuration,
             OutputDirectory = nugetRoot,
             NoBuild = true,
