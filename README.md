@@ -84,7 +84,7 @@ foreach(var appSetting in Kudu.AppSettings)
         );
 }
 ```
-Connection strings can be accessed `IDictionary<string, string> AppSettings` property. 
+Connection strings can be accessed `IDictionary<string, string> ConnectionStrings` property. 
 ```csharp
 foreach(var conectionString in Kudu.ConnectionStrings)
 {
