@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Cake.Kudu</id>
+    <version>0.0.0</version>
+    <authors>WCOM AB</authors>
+    <owners>WCOM AB, cake-contrib</owners>
+    <description>Cake add-in to help with Kudu deployments using C# </description>
+    <summary>Cake AddIn that extends Cake with Kudu evironment and deployment features</summary>
+    <licenseUrl>https://github.com/cake-contrib/Cake.Kudu/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/cake-contrib/Cake.Kudu/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://cdn.rawgit.com/cake-contrib/graphics/a5cf0f881c390650144b2243ae551d5b9f836196/png/cake-contrib-medium.png</iconUrl>
+    <copyright>Copyright (c) WCOM AB</copyright>
+    <tags>Cake, Script, Build, Microsoft Teams</tags>
+  </metadata>
+  <files>
+    <file src="net46\Cake.Kudu.dll" target="lib/net46" />
+    <file src="net46\Cake.Kudu.pdb" target="lib/net46" />
+    <file src="net46\Cake.Kudu.xml" target="lib/net46" />
+    <file src="netstandard1.6\Cake.Kudu.dll" target="lib/netstandard1.6" /> 
+    <file src="netstandard1.6\Cake.Kudu.pdb" target="lib/netstandard1.6" />
+  </files>
+</package>

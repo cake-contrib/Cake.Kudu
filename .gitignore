@@ -184,9 +184,12 @@ FakesAssemblies/
 
 #Cake Nuget dir
 [Nn]uget/
+![Nn]uspec/[Nn]uget/Cake.Kudu.nuspec
 
 #Cake (generated)
 [Tt]ools/
+![Tt]ools/packages.config
+[Bb]uild[Aa]rtifacts/
 
 # Kudu Local
 [Ll]ocal[Dd]eploy/
