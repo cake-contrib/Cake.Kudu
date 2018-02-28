@@ -18,7 +18,7 @@
     <file src="net46\Cake.Kudu.dll" target="lib/net46" />
     <file src="net46\Cake.Kudu.pdb" target="lib/net46" />
     <file src="net46\Cake.Kudu.xml" target="lib/net46" />
-    <file src="netstandard1.6\Cake.Kudu.dll" target="lib/netstandard1.6" /> 
-    <file src="netstandard1.6\Cake.Kudu.pdb" target="lib/netstandard1.6" />
+    <file src="netstandard2.0\Cake.Kudu.dll" target="lib/netstandard2.0" /> 
+    <file src="netstandard2.0\Cake.Kudu.pdb" target="lib/netstandard2.0" />
   </files>
 </package>
