@@ -5,7 +5,7 @@ Environment.SetVariableNames();
 BuildParameters.SetParameters(context: Context,
                             buildSystem: BuildSystem,
                             sourceDirectoryPath: "./src",
-			    solutionFilePath: "./src/Cake.Kudu.sln",
+                            solutionFilePath: "./src/Cake.Kudu.sln",
                             title: "Cake.Kudu",
                             repositoryOwner: "cake-contrib",
                             repositoryName: "Cake.Kudu",
