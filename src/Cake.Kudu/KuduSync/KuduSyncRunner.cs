@@ -101,7 +101,7 @@ namespace Cake.Kudu.KuduSync
         /// <returns>The tool executable name.</returns>
         protected override IEnumerable<string> GetToolExecutableNames()
         {
-            return new[] { "KuduSync.NET.exe" };
+            return new[] { "KuduSync.NET.exe", "kudusync.exe", "kudusync" };
         }
     }
 }
