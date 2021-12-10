@@ -200,3 +200,5 @@ project.lock.json
 restore.dg
 
 .DS_Store
+
+src/.vs/

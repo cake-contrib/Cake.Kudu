@@ -9,12 +9,7 @@
     <CodeAnalysisRuleSet>..\Cake.Kudu.ruleset</CodeAnalysisRuleSet>
     <NoWarn>$(NoWarn);SA1633;SA1200;SA1101;SA1202</NoWarn>
     <ContinuousIntegrationBuild  Condition="'$(IsAutomatedBuild)'=='' AND '$(APPVEYOR)'!=''">true</ContinuousIntegrationBuild >
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\Cake.Kudu.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Cake.Kudu.xml</DocumentationFile>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp3.1\Cake.Kudu.xml</DocumentationFile>
