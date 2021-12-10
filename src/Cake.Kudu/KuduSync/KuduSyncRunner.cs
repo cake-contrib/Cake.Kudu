@@ -11,8 +11,6 @@ namespace Cake.Kudu.KuduSync
     /// </summary>
     public sealed class KuduSyncRunner : Tool<KuduSyncSettings>
     {
-        private readonly ICakeEnvironment _environment;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="KuduSyncRunner" /> class.
         /// </summary>
@@ -23,11 +21,13 @@ namespace Cake.Kudu.KuduSync
         public KuduSyncRunner(IFileSystem fileSystem, ICakeEnvironment environment, IProcessRunner processRunner, IToolLocator toolLocator)
             : base(fileSystem, environment, processRunner, toolLocator)
         {
-            _environment = environment;
+            Environment = environment;
         }
 
+        private ICakeEnvironment Environment { get; }
+
         /// <summary>
-        /// Sync two folders content
+        /// Sync two folders content.
         /// </summary>
         /// <param name="source">The source directory path.</param>
         /// <param name="target">The target directory path.</param>
@@ -38,6 +38,7 @@ namespace Cake.Kudu.KuduSync
             {
                 throw new ArgumentNullException(nameof(source));
             }
+
             if (target == null)
             {
                 throw new ArgumentNullException(nameof(target));
@@ -53,21 +54,21 @@ namespace Cake.Kudu.KuduSync
             var builder = new ProcessArgumentBuilder();
 
             builder.Append("--from");
-            builder.AppendQuoted(source.MakeAbsolute(_environment).FullPath);
+            builder.AppendQuoted(source.MakeAbsolute(Environment).FullPath);
 
             builder.Append("--to");
-            builder.AppendQuoted(target.MakeAbsolute(_environment).FullPath);
+            builder.AppendQuoted(target.MakeAbsolute(Environment).FullPath);
 
             if (settings.NextManifest != null)
             {
                 builder.Append("--nextManifest");
-                builder.AppendQuoted(settings.NextManifest.MakeAbsolute(_environment).FullPath);
+                builder.AppendQuoted(settings.NextManifest.MakeAbsolute(Environment).FullPath);
             }
 
             if (settings.PreviousManifest != null)
             {
                 builder.Append("--previousManifest");
-                builder.AppendQuoted(settings.PreviousManifest.MakeAbsolute(_environment).FullPath);
+                builder.AppendQuoted(settings.PreviousManifest.MakeAbsolute(Environment).FullPath);
             }
 
             if ((settings.NextManifest == null && settings.PreviousManifest == null) || settings.IgnoreManifest)

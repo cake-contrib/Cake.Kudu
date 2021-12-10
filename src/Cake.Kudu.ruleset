@@ -66,5 +66,9 @@
     <Rule Id="CA1014" Action="Warning" />
     <Rule Id="CA1305" Action="Warning" />
     <Rule Id="CA1062" Action="Warning" />
+    <Rule Id="SA1633" Action="None" />
+    <Rule Id="SA1200" Action="None" />
+    <Rule Id="SA1101" Action="None" />
+    <Rule Id="SA1202" Action="None" />
   </Rules>
 </RuleSet>

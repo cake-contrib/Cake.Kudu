@@ -4,13 +4,29 @@ using Cake.Kudu.Helpers;
 namespace Cake.Kudu.Provider
 {
     /// <summary>
-    /// Provides info about Kudu SCM environment
+    /// Provides info about Kudu SCM environment.
     /// </summary>
     // ReSharper disable once InconsistentNaming
     public sealed class SCM
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SCM"/> class.
+        /// </summary>
+        /// <param name="environmenVariables">The environmenVariables.</param>
+        internal SCM(IDictionary<string, string> environmenVariables)
+        {
+            BuildArgs = environmenVariables.TryGetString("SCM_BUILD_ARGS");
+            CommandIdleTimeout = environmenVariables.TryParseInt("SCM_COMMAND_IDLE_TIMEOUT");
+            CommitId = environmenVariables.TryGetString("SCM_COMMIT_ID");
+            Email = environmenVariables.TryGetString("SCM_GIT_EMAIL");
+            UserName = environmenVariables.TryGetString("SCM_GIT_USERNAME");
+            Type = environmenVariables.TryGetString("ScmType");
+            Branch = environmenVariables.TryGetString("deployment_branch");
+        }
+
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnusedAutoPropertyAccessor.Global
+
         /// <summary>
         /// Gets the source control build args.
         /// </summary>
@@ -45,18 +61,8 @@ namespace Cake.Kudu.Provider
         /// Gets the SCM branch that triggered the deployment.
         /// </summary>
         public string Branch { get; }
+
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore UnusedAutoPropertyAccessor.Global
-
-        internal SCM(IDictionary<string, string> environmenVariables)
-        {
-            BuildArgs = environmenVariables.TryGetString("SCM_BUILD_ARGS");
-            CommandIdleTimeout = environmenVariables.TryParseInt("SCM_COMMAND_IDLE_TIMEOUT");
-            CommitId = environmenVariables.TryGetString("SCM_COMMIT_ID");
-            Email = environmenVariables.TryGetString("SCM_GIT_EMAIL");
-            UserName = environmenVariables.TryGetString("SCM_GIT_USERNAME");
-            Type = environmenVariables.TryGetString("ScmType");
-            Branch = environmenVariables.TryGetString("deployment_branch");
-        }
     }
 }
