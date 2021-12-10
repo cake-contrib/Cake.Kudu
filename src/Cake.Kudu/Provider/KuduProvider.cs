@@ -13,7 +13,40 @@ namespace Cake.Kudu.Provider
     /// </summary>
     public sealed class KuduProvider
     {
-        private readonly KuduSyncRunner _kuduSyncRunner;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KuduProvider"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        internal KuduProvider(ICakeContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var environmenVariables = context.EnvironmentVariables();
+            Deployment = new Deployment(environmenVariables);
+            WebSite = new WebSite(environmenVariables);
+            SCM = new SCM(environmenVariables);
+            Tools = new Tools(environmenVariables);
+            AppSettings = environmenVariables
+                .Where(key => key.Key.StartsWith("APPSETTING_"))
+                .ToDictionary(
+                    key => string.Concat(key.Key.Skip(11)),
+                    value => value.Value);
+
+            ConnectionStrings = environmenVariables
+                .Where(key => key.Key.StartsWith("SQLAZURECONNSTR_"))
+                .ToDictionary(
+                    key => string.Concat(key.Key.Skip(16)),
+                    value => value.Value);
+
+            IsRunningOnKudu = !string.IsNullOrWhiteSpace(WebSite.Name);
+
+            KuduSyncRunner = new KuduSyncRunner(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools);
+        }
+
+        private KuduSyncRunner KuduSyncRunner { get; }
 
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -56,11 +89,12 @@ namespace Cake.Kudu.Provider
         /// Gets the Kudu connection strings.
         /// </summary>
         public IDictionary<string, string> ConnectionStrings { get; }
+
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore UnusedAutoPropertyAccessor.Global
 
         /// <summary>
-        /// Sync two folders content
+        /// Sync two folders content.
         /// </summary>
         /// <param name="source">The source directory path.</param>
         // ReSharper disable once UnusedMember.Global
@@ -75,7 +109,7 @@ namespace Cake.Kudu.Provider
         }
 
         /// <summary>
-        /// Sync two folders content
+        /// Sync two folders content.
         /// </summary>
         /// <param name="source">The source directory path.</param>
         /// <param name="target">The target directory path.</param>
@@ -96,12 +130,12 @@ namespace Cake.Kudu.Provider
             Sync(source, target, new KuduSyncSettings
             {
                 PreviousManifest = Deployment.PreviousManifest,
-                NextManifest = Deployment.NextManifest
+                NextManifest = Deployment.NextManifest,
             });
         }
 
         /// <summary>
-        /// Sync two folders content
+        /// Sync two folders content.
         /// </summary>
         /// <param name="source">The source directory path.</param>
         /// <param name="target">The target directory path.</param>
@@ -124,41 +158,7 @@ namespace Cake.Kudu.Provider
                 throw new ArgumentNullException(nameof(settings));
             }
 
-            _kuduSyncRunner.Sync(source, target, settings);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KuduProvider"/> class.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        internal KuduProvider(ICakeContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var environmenVariables = context.EnvironmentVariables();
-            Deployment = new Deployment(environmenVariables);
-            WebSite = new WebSite(environmenVariables);
-            SCM = new SCM(environmenVariables);
-            Tools = new Tools(environmenVariables);
-            AppSettings = environmenVariables
-                .Where(key => key.Key.StartsWith("APPSETTING_"))
-                .ToDictionary(
-                    key => string.Concat(key.Key.Skip(11)),
-                    value => value.Value
-                );
-            ConnectionStrings = environmenVariables
-                .Where(key => key.Key.StartsWith("SQLAZURECONNSTR_"))
-                .ToDictionary(
-                    key => string.Concat(key.Key.Skip(16)),
-                    value => value.Value
-                );
-            IsRunningOnKudu = !string.IsNullOrWhiteSpace(WebSite.Name);
-
-
-            _kuduSyncRunner = new KuduSyncRunner(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools);
+            KuduSyncRunner.Sync(source, target, settings);
         }
     }
 }

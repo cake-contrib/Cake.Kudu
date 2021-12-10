@@ -1,4 +1,10 @@
+#pragma warning disable SA1402
+#pragma warning disable SA1403
+#pragma warning disable SA1649
+using System;
 using System.Runtime.CompilerServices;
+
+[assembly:CLSCompliant(true)]
 
 // ReSharper disable once CheckNamespace
 namespace Cake.Kudu
@@ -35,3 +41,6 @@ namespace Cake.Kudu.KuduSync
     {
     }
 }
+#pragma warning restore SA1649
+#pragma warning restore SA1402
+#pragma warning restore SA1403
