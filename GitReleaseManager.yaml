@@ -3,3 +3,4 @@ issue-labels-include:
 - bug
 issue-labels-exclude:
 - invalid
+- build
