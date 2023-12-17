@@ -16,14 +16,11 @@
     <tags>Cake, Script, Build, Kudu, Azure, cake-addin</tags>
   </metadata>
   <files>
-    <file src="net5.0\Cake.Kudu.dll" target="lib/net5.0" />
-    <file src="net5.0\Cake.Kudu.pdb" target="lib/net5.0" />
-    <file src="net5.0\Cake.Kudu.xml" target="lib/net5.0" />
     <file src="net6.0\Cake.Kudu.dll" target="lib/net6.0" />
     <file src="net6.0\Cake.Kudu.pdb" target="lib/net6.0" />
     <file src="net6.0\Cake.Kudu.xml" target="lib/net6.0" />
-    <file src="netcoreapp3.1\Cake.Kudu.dll" target="lib/netcoreapp3.1" />
-    <file src="netcoreapp3.1\Cake.Kudu.pdb" target="lib/netcoreapp3.1" />
-    <file src="netcoreapp3.1\Cake.Kudu.xml" target="lib/netcoreapp3.1" />
+    <file src="net7.0\Cake.Kudu.dll" target="lib/net7.0" />
+    <file src="net7.0\Cake.Kudu.pdb" target="lib/net7.0" />
+    <file src="net7.0\Cake.Kudu.xml" target="lib/net7.0" />
   </files>
 </package>
