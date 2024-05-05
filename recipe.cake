@@ -1,4 +1,4 @@
-#load nuget:?package=Cake.Recipe&version=1.1.2
+#load nuget:?package=Cake.Recipe&version=3.1.1
 
 Environment.SetVariableNames();
 
@@ -10,15 +10,13 @@ BuildParameters.SetParameters(context: Context,
                             repositoryOwner: "cake-contrib",
                             repositoryName: "Cake.Kudu",
                             appVeyorAccountName: "cakecontrib",
-                            shouldRunDupFinder: false,
-                            shouldRunInspectCode: false,
-                            shouldRunGitVersion: true);
+                            shouldRunInspectCode: false);
 
 BuildParameters.PrintParameters(Context);
 
-ToolSettings.SetToolSettings(context: Context,
-                            dupFinderExcludePattern: new string[] {
-                                BuildParameters.RootDirectoryPath + "/src/Cake.Kudu/**/*.AssemblyInfo.cs",
-                                BuildParameters.RootDirectoryPath + "/src/Cake.Kudu/LitJson/**/*.cs" });
+// There are no tests to run
+((CakeTask)BuildParameters.Tasks.InstallOpenCoverTask.Task).Actions.Clear();
+((CakeTask)BuildParameters.Tasks.DotNetCoreTestTask.Task).Actions.Clear();
+((CakeTask)BuildParameters.Tasks.GenerateLocalCoverageReportTask.Task).Actions.Clear();
 
 Build.RunDotNetCore();
