@@ -7,7 +7,7 @@ image: Visual Studio 2022
 #  Build Script                   #
 #---------------------------------#
 build_script:
-  - ps: .\build.ps1 -Target AppVeyor
+  - ps: .\build.ps1 --target CI
 
 #---------------------------------#
 # Tests
@@ -40,7 +40,7 @@ branches:
 #  Build Cache                    #
 #---------------------------------#
 cache:
-- tools -> recipe.cake, tools/packages.config
+- tools -> recipe.cake, .config/dotnet-tools.json
 
 #---------------------------------#
 #  Skip builds for doc changes    #
