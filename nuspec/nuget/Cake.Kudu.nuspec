@@ -22,5 +22,8 @@
     <file src="net7.0\Cake.Kudu.dll" target="lib/net7.0" />
     <file src="net7.0\Cake.Kudu.pdb" target="lib/net7.0" />
     <file src="net7.0\Cake.Kudu.xml" target="lib/net7.0" />
+    <file src="net8.0\Cake.Kudu.dll" target="lib/net8.0" />
+    <file src="net8.0\Cake.Kudu.pdb" target="lib/net8.0" />
+    <file src="net8.0\Cake.Kudu.xml" target="lib/net8.0" />
   </files>
 </package>
